@@ -29,22 +29,16 @@ glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   }
   glfwMakeContextCurrent(window);
                                   
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
   // start GLEW extension handler
   glewExperimental = GL_TRUE;
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
   glewInit();
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
 
   // get version info
   const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
   const GLubyte* version = glGetString(GL_VERSION); // version as a string
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
   printf("Renderer: %s\n", renderer);
   printf("OpenGL version supported %s\n", version);
 
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
   // tell GL to only draw onto a pixel if the shape is closer to the viewer
   glEnable(GL_DEPTH_TEST); // enable depth-testing
   glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
@@ -57,13 +51,11 @@ float points[] = {
 };
 
 
-std::cout << __LINE__ << ": " <<  glGetError() << std::endl;
 GLuint vbo = 0;
 glGenBuffers(1, &vbo);
 glBindBuffer(GL_ARRAY_BUFFER, vbo);
 glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), points, GL_STATIC_DRAW);
 
-std::cout << __LINE__ << ": " << glGetError() << std::endl;
 
 GLuint vao = 0;
 glGenVertexArrays(1, &vao);
@@ -72,7 +64,6 @@ glEnableVertexAttribArray(0);
 glBindBuffer(GL_ARRAY_BUFFER, vbo);
 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-std::cout << __LINE__ << ": " << glGetError() << std::endl;
 const char* vertex_shader =
 "#version 400\n"
 "in vec3 vp;"
@@ -89,7 +80,6 @@ const char* fragment_shader =
 
 char infoLog[512];
 
-std::cout << __LINE__ << ": " << glGetError() << std::endl;
 GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 glShaderSource(vs, 1, &vertex_shader, NULL);
 glCompileShader(vs);
@@ -100,14 +90,8 @@ if(isCompiled == GL_FALSE)
 {
     GLint maxLength = 0;
     glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &maxLength);
-
-    // The maxLength includes the NULL character
     glGetShaderInfoLog(vs, maxLength, &maxLength, infoLog);
-    
     std::cout << __LINE__ << ": " << infoLog << std::endl; 
-
-    // Provide the infolog in whatever manor you deem best.
-    // Exit with failure.
     return 0;
 }
 
@@ -129,7 +113,6 @@ if(!success) {
     std::cout << __LINE__ << ": " << infoLog << std::endl; 
 }
 
-std::cout << __LINE__ << ": "  << glGetError() << std::endl;
 while(!glfwWindowShouldClose(window)) {
   // wipe the drawing surface clear
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
