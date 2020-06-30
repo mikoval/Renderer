@@ -11,15 +11,18 @@ int main() {
     return 1;
   } 
 
-  // uncomment these lines if on Apple OS X
-  /*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+ #ifdef __APPLE__
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
+#ifdef __linux__
 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
   GLFWwindow* window = glfwCreateWindow(640, 480, "Hello Triangle", NULL, NULL);
   if (!window) {
