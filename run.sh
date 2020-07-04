@@ -1,4 +1,5 @@
 cd build
+rm -rf *
 cmake ..
 make
-./bin/renderer
+./bin/example

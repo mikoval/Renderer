@@ -1,24 +1,12 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+project(Sandbox)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-LINK_DIRECTORIES(/usr/local/lib)
-
-project (renderer)
-add_executable(renderer Renderer/main.cpp)
-
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
-include_directories(${GLFW_INCLUDE_DIRS})
-target_link_libraries(renderer ${GLFW_LIBRARIES})
-
-find_package(PkgConfig REQUIRED)
-pkg_search_module(GLEW REQUIRED glew)
-include_directories(${GLEW_INCLUDE_DIRS})
-target_link_libraries(renderer ${GLEW_LIBRARIES})
-
-find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-target_link_libraries(renderer ${OPENGL_LIBRARIES})
+add_subdirectory(Renderer)
+add_subdirectory(Examples)
