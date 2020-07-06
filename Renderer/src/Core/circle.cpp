@@ -1,6 +1,5 @@
 #include <Renderer/circle.h>
 #include <iostream>
-#include <Renderer/renderer.h>
 
 #include "gl_utils.h"
 #include "gl_core.h"
