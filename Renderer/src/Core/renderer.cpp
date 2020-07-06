@@ -1,5 +1,5 @@
 //g++ -o hellot main.cpp -lglfw -lGL -lGLEW 
-#include <GL/glew.h> // include GLEW and new version of GL on Windows
+#include <glad/glad.h>
 #include <GLFW/glfw3.h> // GLFW helper library
 #include <stdio.h>
 #include <iostream>
@@ -15,6 +15,7 @@ thread *t1;
 
 GLFWwindow* window;
 static void (*key_callback)(int, int, int, int);
+static void (*update_callback)(unsigned long);
 
 
 void key_press_base(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -24,8 +25,12 @@ void key_press_base(GLFWwindow* window, int key, int scancode, int action, int m
     }
 }
 
-void Renderer::setKeyboardCallback(void (*foo)(int, int, int, int)) {
-    key_callback = foo;
+void Renderer::setKeyboardCallback(void (*callback)(int, int, int, int)) {
+    key_callback = callback;
+}
+
+void Renderer::setUpdateCallback(void (*callback)(unsigned long)) {
+    update_callback = callback;
 }
 
 void Renderer::setBackgroundColor(float r, float g, float b, float a) {
@@ -34,7 +39,14 @@ void Renderer::setBackgroundColor(float r, float g, float b, float a) {
 
 
 Renderer::Renderer(int width, int height, string name) {
-    t1 = new thread(renderLoop, this, width, height, name);
+    this->width = width;
+    this->height = height;
+    this->name = name;
+    //t1 = new thread(renderLoop, this, width, height, name);
+}
+
+void Renderer::start() {
+    renderLoop(this, width, height, name);
 }
 
 void Renderer::addRenderable(Renderable *renderable) {
@@ -51,7 +63,12 @@ int renderLoop(Renderer *renderer, int width, int height, string name) {
     glfwSetKeyCallback(window, key_press_base);
 
     while(!glfwWindowShouldClose(window)) {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        if(renderer->backgroundColor) {
+            Color *color = renderer->backgroundColor;
+            glClearColor(color->r, color->g, color->b, 1.0);
+        } else {
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        }
         glClear(GL_COLOR_BUFFER_BIT);
 
         vector<Renderable *> renderableList = renderer->getRenderableList();
@@ -60,6 +77,7 @@ int renderLoop(Renderer *renderer, int width, int height, string name) {
         }
         glfwPollEvents();
         glfwSwapBuffers(window);
+        update_callback(0);
     }
 
     // close GL context and any other GLFW resources

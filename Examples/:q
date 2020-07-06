@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 2.8.9)
+
+project (example)
+
+find_package( Threads )
+
+include_directories (${RENDERER_SOURCE_DIR}/includes) 
+link_directories (${RENDERER_BINARY_DIR}/renderer) 
+
+LINK_DIRECTORIES(/usr/local/lib)
+include_directories(/usr/local/include)
+
+add_executable(example main.cpp)
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
+include_directories(${GLFW_INCLUDE_DIRS})
+target_link_libraries(example ${GLFW_LIBRARIES})
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLEW REQUIRED glew)
+include_directories(${GLEW_INCLUDE_DIRS})
+target_link_libraries(example ${GLEW_LIBRARIES})
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLM REQUIRED glew)
+include_directories(${GLM_INCLUDE_DIRS})
+target_link_libraries(example ${GLM_LIBRARIES})
+
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+target_link_libraries(example ${OPENGL_LIBRARIES})
+
+
+target_link_libraries (example renderer) 
+target_link_libraries (example box2d) 
+target_link_libraries( example ${CMAKE_THREAD_LIBS_INIT} )

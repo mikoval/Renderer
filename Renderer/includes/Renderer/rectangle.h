@@ -1,12 +1,13 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "renderable.h"
-class Circle: public Renderable {
+class Rectangle: public Renderable {
     public:
-        Circle(float radius);
+        Rectangle(int width, int height);
         void render();
         glm::vec2 position;
         float rotation;
+        glm::vec2 scale;
     private:
         bool mInit;
         void init();
