@@ -14,9 +14,19 @@ add_executable(example main.cpp)
 
 
 
-target_link_libraries (example "-framework Cocoa")
-target_link_libraries (example "-framework IOKit")
-target_link_libraries (example "-framework CoreVideo")
+# Establish target libraries and include directories
+if (APPLE)
+
+    list(APPEND glfw_LIBRARIES
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreFoundation"
+        "-framework CoreVideo")
+endif()
+
+
+target_link_libraries (example ${CMAKE_DL_LIBS})
+target_link_libraries (example ${RT_LIBRARY})
 target_link_libraries (example glfw) 
 target_link_libraries (example renderer) 
 target_link_libraries (example box2d) 

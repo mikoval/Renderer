@@ -22,5 +22,7 @@ target_include_directories(renderer PUBLIC ./includes)
 find_package( Threads )
 target_link_libraries( renderer ${CMAKE_THREAD_LIBS_INIT} ) 
 
+
+target_link_libraries (renderer ${CMAKE_DL_LIBS})
 target_link_libraries (renderer glfw)
 target_link_libraries (renderer glad)
