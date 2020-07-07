@@ -1,4 +1,3 @@
-#pragma once
 #include "gl_utils.h"
 #include <Renderer/renderer.h>
 #include <iostream>

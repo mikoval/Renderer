@@ -28,17 +28,9 @@
 
 /// This function is used to ensure that a floating point number is not a NaN or infinity.
        /// checks whether a float is finite
-inline static int is_finite(double f)
-{
-#if defined(isfinite) && !defined(SUNOS)
-    return isfinite(f);
-#else
-    return finite(f);
-#endif
-}
 inline bool b2IsValid(float x)
 {
-	return is_finite(x);
+	return isfinite(x);
 }
 
 #define	b2Sqrt(x)	sqrtf(x)

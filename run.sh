@@ -1,5 +1,5 @@
 cd build
-rm -rf *
+#rm -rf *
 cmake ..
 make
 ./bin/example
