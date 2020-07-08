@@ -12,7 +12,9 @@
 class Renderer {
     public:
         Renderer(int width, int height, std::string name);
-        void setKeyboardCallback(void (*foo)(int, int, int, int));
+        void setKeyboardCallback(void (*cb)(int, int, int, int));
+        void setMouseButtonCallback(void (*cb)(int, int, int));
+        void setMouseMoveCallback(void (*cb)(double, double));
         void setUpdateCallback(void (*callback)(unsigned long));
         void setBackgroundColor(float r, float g, float b, float a);
         Color *backgroundColor = nullptr;

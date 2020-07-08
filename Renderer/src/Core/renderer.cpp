@@ -15,6 +15,8 @@ thread *t1;
 
 GLFWwindow* window;
 static void (*key_callback)(int, int, int, int);
+static void (*mouse_button_callback)(int, int, int);
+static void (*mouse_move_callback)(double, double);
 static void (*update_callback)(unsigned long);
 
 
@@ -25,8 +27,30 @@ void key_press_base(GLFWwindow* window, int key, int scancode, int action, int m
     }
 }
 
+void mouse_press_base(GLFWwindow* window, int button,  int action, int mods)
+{
+    if(mouse_button_callback)  {
+        mouse_button_callback(button, action, mods);
+    }
+}
+
+void mouse_move_base(GLFWwindow* window,  double x, double y)
+{
+    if(mouse_move_callback)  {
+        mouse_move_callback(x,y);
+    }
+}
+
 void Renderer::setKeyboardCallback(void (*callback)(int, int, int, int)) {
     key_callback = callback;
+}
+
+void Renderer::setMouseButtonCallback(void (*callback)(int, int, int)) {
+    mouse_button_callback = callback;
+}
+
+void Renderer::setMouseMoveCallback(void (*callback)(double, double)) {
+    mouse_move_callback = callback;
 }
 
 void Renderer::setUpdateCallback(void (*callback)(unsigned long)) {
@@ -61,6 +85,8 @@ vector<Renderable *>  Renderer::getRenderableList() {
 int renderLoop(Renderer *renderer, int width, int height, string name) {
     window = makeWindow(width, height, name);
     glfwSetKeyCallback(window, key_press_base);
+    glfwSetMouseButtonCallback(window, mouse_press_base);
+    glfwSetCursorPosCallback(window, mouse_move_base);
 
     while(!glfwWindowShouldClose(window)) {
         if(renderer->backgroundColor) {

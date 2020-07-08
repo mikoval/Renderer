@@ -3,14 +3,16 @@ cmake_minimum_required(VERSION 2.8.9)
 project (example)
 
 
-#include_directories (${RENDERER_SOURCE_DIR}/includes) 
-#link_directories (${RENDERER_BINARY_DIR}/renderer) 
-
 
 LINK_DIRECTORIES(/usr/local/lib)
 include_directories(/usr/local/include)
 
-add_executable(example main.cpp)
+file(GLOB_RECURSE SOURCES
+    "src/*.h"
+    "src/*.cpp"
+)
+
+add_executable(example ${SOURCES})
 
 
 
