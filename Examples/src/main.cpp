@@ -34,12 +34,18 @@ double mouseY = 0;
 #define min(X, Y)
 
 
+float randFloat() {
+    return (float)rand() / (float)RAND_MAX;
+}
+
 void addBody(double mouseX, double mouseY) {
     GameObject *obj;
-    if(rand() % 2 == 0)
-        obj = new GameRect(100, 100, (int)mouseX, (int)mouseY);
-    else
-        obj = new GameCircle(50, (int)mouseX, (int)mouseY);
+    if(rand() % 2 == 0) {
+        obj = new GameRect( 1 + rand() % 200, 1 + rand() % 200, (int)mouseX, (int)mouseY);
+    } else {
+        obj = new GameCircle(rand() % 100, (int)mouseX, (int)mouseY);
+    }
+    obj ->getRenderable()-> setColor(randFloat(), randFloat(), randFloat(), 1.0f);
     bodies.push_back(obj);
 }
 

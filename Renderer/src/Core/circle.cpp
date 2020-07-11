@@ -13,6 +13,8 @@ Circle::Circle(int radius) {
     this->scale.x = 2.0f * radius;
     this->scale.y = 2.0f * radius;
     mInit = false;
+    printf("CALLING SET COLOR FROM CIRCLE CONSTRUCTOR \n");
+    setColor(1.0, 1.0, 1.0, 1.0);
 }
 
 void Circle::render() {
@@ -32,6 +34,9 @@ void Circle::render() {
     glBindVertexArray(VAO);
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
+    glUniform4f(colorLoc, r, g, b, a);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -50,10 +55,11 @@ void Circle::init() {
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
         "in vec2 vUv;\n"
+        "uniform vec4 color;"
         "void main()\n"
         "{\n"
         "   if(length(2.0f * (vUv - 0.5f)) > 1.0) { discard; }\n"
-        "   FragColor = vec4(1.0f, 0.3f, 0.0f, 1.0f);\n"
+        "   FragColor = color;\n"
         "}\n\0";
 
     unsigned int VBO_VERTICES;
@@ -100,9 +106,10 @@ void Circle::init() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    glBindVertexArray(0); 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
     mInit = true;
 
 }
+

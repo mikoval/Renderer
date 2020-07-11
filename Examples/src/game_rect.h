@@ -8,6 +8,7 @@ class GameRect : public GameObject {
         b2Body* body;
         GameRect(int width, int height, int x, int y);
         void update();
+        Renderable *getRenderable();
     private:
 
 };

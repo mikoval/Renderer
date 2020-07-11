@@ -37,3 +37,7 @@ void GameRect::update() {
     renderable->position.y = position.y * 100;
     renderable->rotation = angle;
 }
+
+Renderable *GameRect::getRenderable() {
+    return renderable;
+}
