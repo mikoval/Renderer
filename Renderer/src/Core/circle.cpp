@@ -7,13 +7,13 @@
 #include "glm/gtx/string_cast.hpp"
 
 #include "gl_utils.h"
+#include "gl_core.h"
 
 using namespace std;
 Circle::Circle(int radius) {
     this->scale.x = 2.0f * radius;
     this->scale.y = 2.0f * radius;
     mInit = false;
-    printf("CALLING SET COLOR FROM CIRCLE CONSTRUCTOR \n");
     setColor(1.0, 1.0, 1.0, 1.0);
 }
 
@@ -22,7 +22,7 @@ void Circle::render() {
         init();
     }
 
-    glm::mat4 P = glm::ortho(0.0f, 1200.0f,0.0f,800.0f, -1.0f, 100.0f);
+    glm::mat4 P = glm::ortho(0.0f, (float)screenWidth,0.0f,(float)screenHeight, -1.0f, 100.0f);
 
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
@@ -36,7 +36,7 @@ void Circle::render() {
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
 
     unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
-    glUniform4f(colorLoc, r, g, b, a);
+    glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
     //glDrawArrays(GL_TRIANGLES, 0, 3);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

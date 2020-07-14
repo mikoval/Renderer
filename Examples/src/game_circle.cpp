@@ -5,10 +5,8 @@
 
 GameCircle::GameCircle(int radius, int x, int y) {
     renderable = new Circle(radius);
-    printf("CREATED GAME CIRCLE \n");
     renderer->addRenderable(renderable);
     renderable->setColor(1.0, 1.0, 0.0, 1.0);
-    std::cout << "addr off renderable : " << renderable << std::endl; 
 
         // Define the dynamic body. We set its position and call the body factory.
     b2BodyDef bodyDef;

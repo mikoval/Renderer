@@ -8,6 +8,7 @@
 #include <Renderer/renderer.h>
 #include <Renderer/circle.h>
 #include "gl_context.h"
+#include "gl_core.h"
 
 using namespace std;
 
@@ -18,6 +19,9 @@ static void (*key_callback)(int, int, int, int);
 static void (*mouse_button_callback)(int, int, int);
 static void (*mouse_move_callback)(double, double);
 static void (*update_callback)(unsigned long);
+
+int screenWidth;
+int screenHeight;
 
 
 void key_press_base(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -66,6 +70,8 @@ Renderer::Renderer(int width, int height, string name) {
     this->width = width;
     this->height = height;
     this->name = name;
+    screenWidth = width;
+    screenHeight = height;
     //t1 = new thread(renderLoop, this, width, height, name);
 }
 

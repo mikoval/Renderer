@@ -29,6 +29,9 @@ float timeStep = 1.0f / 60.0f;
 double mouseX = 0;
 double mouseY = 0;
 
+extern int screenWidth;
+extern int screenHeight;
+
 
 #define RAD(deg) ((3.14 * deg)/180.f)
 #define min(X, Y)
@@ -116,7 +119,7 @@ int main() {
 
 
 
-    renderer = new Renderer(screenWidth, screenHeight, "Hello world");
+    renderer = new Renderer(1200, 800, "Hello world");
 
     renderer->setUpdateCallback(&update);
 

@@ -7,6 +7,7 @@
 #include "glm/gtx/string_cast.hpp"
 
 #include "gl_utils.h"
+#include "gl_core.h"
 
 using namespace std;
 Rectangle::Rectangle(int width, int height) {
@@ -20,7 +21,9 @@ void Rectangle::render() {
         init();
     }
 
-    glm::mat4 P = glm::ortho(0.0f, 1200.0f,0.0f,800.0f, -1.0f, 100.0f);
+    printf("SCREEN DIMENTIONS: %d, %d \n", screenWidth, screenHeight);
+
+    glm::mat4 P = glm::ortho(0.0f, (float)screenWidth,0.0f,(float)screenHeight, -1.0f, 100.0f);
 
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
@@ -31,8 +34,11 @@ void Rectangle::render() {
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+
+    unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
+    glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
+
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
-    //glDrawArrays(GL_TRIANGLES, 0, 3);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -46,9 +52,10 @@ void Rectangle::init() {
         "}\0";
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "uniform vec4 color;"
         "void main()\n"
         "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "   FragColor = color;\n"
         "}\n\0";
 
     unsigned int VBO;
