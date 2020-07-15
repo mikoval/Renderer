@@ -1,5 +1,7 @@
 #include "game_rect.h"
 #include "core.h"
+#include <stdio.h>  
+#include <iostream> 
 
 GameRect::GameRect(int width, int height, int x, int y) {
     renderable = new Rectangle(width, height);
@@ -26,7 +28,10 @@ GameRect::GameRect(int width, int height, int x, int y) {
     fixtureDef.friction = 0.3f;
 
     // Add the shape to the body.
-    body->CreateFixture(&fixtureDef);
+    
+    fixture = body->CreateFixture(&fixtureDef);
+    std::cout << "fixture addr : " << fixture << std::endl;
+    //fixture->SetRestitution(1.0);
 }
 
 void GameRect::update() {

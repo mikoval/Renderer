@@ -29,7 +29,7 @@ GameCircle::GameCircle(int radius, int x, int y) {
     fixtureDef.friction = 0.3f;
 
     // Add the shape to the body.
-    body->CreateFixture(&fixtureDef);
+    fixture = body->CreateFixture(&fixtureDef);
 }
 
 void GameCircle::update() {

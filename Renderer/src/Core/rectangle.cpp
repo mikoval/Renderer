@@ -21,7 +21,6 @@ void Rectangle::render() {
         init();
     }
 
-    printf("SCREEN DIMENTIONS: %d, %d \n", screenWidth, screenHeight);
 
     glm::mat4 P = glm::ortho(0.0f, (float)screenWidth,0.0f,(float)screenHeight, -1.0f, 100.0f);
 

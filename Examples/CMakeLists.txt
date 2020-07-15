@@ -13,12 +13,14 @@ file(GLOB_RECURSE SANDBOX0_SOURCES
     "src/*.h"
     "src/*.cpp"
     "Sandbox0/*.cpp"
+    "Sandbox0/*.h"
 )
 
 file(GLOB_RECURSE PONG_SOURCES
     "src/*.h"
     "src/*.cpp"
     "Pong/*.cpp"
+    "Pong/*.h"
 )
 
 add_executable(Sandbox0 ${SANDBOX0_SOURCES})
