@@ -25,12 +25,12 @@ GameRect::GameRect(int width, int height, int x, int y) {
     fixtureDef.density = 1.0f;
 
     // Override the default friction.
-    fixtureDef.friction = 0.3f;
+    //fixtureDef.friction = 0.3f;
 
     // Add the shape to the body.
     
     fixture = body->CreateFixture(&fixtureDef);
-    std::cout << "fixture addr : " << fixture << std::endl;
+    body->SetUserData((char *)"NULL");
     //fixture->SetRestitution(1.0);
 }
 

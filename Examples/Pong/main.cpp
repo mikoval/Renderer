@@ -9,13 +9,14 @@
 #include "game_circle.h"
 
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 #include <stdio.h>
 #include "playerContactListener.h"
 
+#include "core_pong.h"
+
 using namespace std;
 
-long int start_ms;
 
 
 vector<GameObject *> bodies;
@@ -39,13 +40,26 @@ extern int screenHeight;
 int dir_right = 0;
 int dir_left = 0;
 
+float playerWidth = 200;
+
+
 
 #define RAD(deg) ((3.14 * deg)/180.f)
 #define min(X, Y)
 
+unsigned long startTime;
+unsigned long prevTime;
+int count = 0;
 
 float randFloat() {
     return (float)rand() / (float)RAND_MAX;
+}
+
+static  long getTime() {
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    long ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+    return ms;
 }
 
 void addBody(double mouseX, double mouseY) {
@@ -91,6 +105,15 @@ void key_press(int key, int scancode, int action, int mods) {
 void update(unsigned long time) {
     player->body->SetLinearVelocity(b2Vec2(dir_right - dir_left, 0.0));
     world->Step(timeStep, velocityIterations, positionIterations);
+    long current = getTime();
+    long ellapsedTime = current - startTime; 
+    count ++;
+    if(ellapsedTime > 1000 ) {
+        startTime = current;
+        printf("count : %d \n", count);
+        count = 0;
+    }
+   // printf("ELLAPSED TIME = %u \n", current - startTime);
 
     for(int i = 0; i < bodies.size() ; i++ ) {
         bodies[i]->update();
@@ -98,6 +121,7 @@ void update(unsigned long time) {
 }
 
 int main() {
+    startTime = prevTime = getTime();
     renderer = new Renderer(400, 800, "Hello world");
 
     renderer->setUpdateCallback(&update);
@@ -120,6 +144,7 @@ int main() {
         b2PolygonShape groundBox;
         groundBox.SetAsBox(10.0f, 50.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
+        groundBody->SetUserData((char *)"NULL");
     }
     {
         b2BodyDef groundBodyDef;
@@ -128,7 +153,10 @@ int main() {
         b2PolygonShape groundBox;
         groundBox.SetAsBox(10.0f, 50.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
+        groundBody->SetUserData((char *)"NULL");
     }
+    
+    
     {
         b2BodyDef groundBodyDef;
         groundBodyDef.position.Set(screenWidth * screenToWorld /2.0, screenHeight * screenToWorld +10);
@@ -136,6 +164,7 @@ int main() {
         b2PolygonShape groundBox;
         groundBox.SetAsBox(50.0f, 10.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
+        groundBody->SetUserData((char *)"NULL");
     }
 
     
@@ -146,13 +175,15 @@ int main() {
     ball->fixture->SetRestitution(1.0);
     ball->fixture->SetDensity(0.1);
     ball->body->ResetMassData();
+    ball->body->SetUserData((void *)"BALL");
 
     bodies.push_back(ball);
 
-    player = new GameRect( 100, 20, screenWidth / 2, 0);
+    player = new GameRect( playerWidth, 20, screenWidth / 2, 0);
     player->getRenderable()->setColor(1.0, 0.0, 0.0, 1.0);
     player->fixture->SetDensity(10000.0);
     player->body->ResetMassData();
+    player->body->SetUserData((void *)"PLAYER");
     //player->body->SetType(b2_kinematicBody);
 
     bodies.push_back(player);

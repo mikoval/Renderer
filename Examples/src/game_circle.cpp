@@ -26,10 +26,11 @@ GameCircle::GameCircle(int radius, int x, int y) {
     fixtureDef.density = 1.0f;
 
     // Override the default friction.
-    fixtureDef.friction = 0.3f;
+    fixtureDef.friction = 0.0f;
 
     // Add the shape to the body.
     fixture = body->CreateFixture(&fixtureDef);
+    body->SetUserData((char *)"NULL");
 }
 
 void GameCircle::update() {
