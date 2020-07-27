@@ -72,11 +72,25 @@ Renderer::Renderer(int width, int height, string name) {
     this->name = name;
     screenWidth = width;
     screenHeight = height;
+
+    window = makeWindow(width, height, name);
+
     //t1 = new thread(renderLoop, this, width, height, name);
 }
 
 void Renderer::start() {
     renderLoop(this, width, height, name);
+}
+
+
+template<typename T>
+inline void remove(vector<T> & v, const T & item)
+{
+    v.erase(std::remove(v.begin(), v.end(), item), v.end());
+}
+
+void Renderer::removeRenderable(Renderable *renderable) {
+    remove(renderable_list, renderable);
 }
 
 void Renderer::addRenderable(Renderable *renderable) {
@@ -89,7 +103,6 @@ vector<Renderable *>  Renderer::getRenderableList() {
 }
 
 int renderLoop(Renderer *renderer, int width, int height, string name) {
-    window = makeWindow(width, height, name);
     glfwSetKeyCallback(window, key_press_base);
     glfwSetMouseButtonCallback(window, mouse_press_base);
     glfwSetCursorPosCallback(window, mouse_move_base);

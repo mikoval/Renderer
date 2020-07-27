@@ -30,7 +30,8 @@ GameCircle::GameCircle(int radius, int x, int y) {
 
     // Add the shape to the body.
     fixture = body->CreateFixture(&fixtureDef);
-    body->SetUserData((char *)"NULL");
+    body->SetUserData(this);
+    this->tag = "GameCircle";
 }
 
 void GameCircle::update() {

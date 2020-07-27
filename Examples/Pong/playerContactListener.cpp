@@ -5,35 +5,44 @@
 using namespace std;
 
 void PlayerContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold) {
-
 }
 
 void PlayerContactListener::PostSolve(b2Contact *contact, const b2ContactImpulse *impulse) { 
-    
 }
 
 void PlayerContactListener::BeginContact(b2Contact* contact) {
     b2Body *ball = nullptr;
     b2Body *player = nullptr;
-     const char *bodyAUserData = (const char *)contact->GetFixtureA()->GetBody()->GetUserData();
-     const char *bodyBUserData = (const char *)contact->GetFixtureB()->GetBody()->GetUserData();
+    b2Body *brick = nullptr;
+
+    GameObject *bodyA = (GameObject *)contact->GetFixtureA()->GetBody()->GetUserData();
+    GameObject *bodyB = (GameObject *)contact->GetFixtureB()->GetBody()->GetUserData();
+     const char *bodyAUserData = bodyA->getTag().c_str();
+     const char *bodyBUserData = bodyB->getTag().c_str(); 
     string dataA(bodyAUserData);
     string dataB(bodyBUserData);
-    printf("BODY A USER DATA : %s \n", bodyAUserData);
-    printf("BODY B USER DATA : %s \n", bodyBUserData);
+    //printf("BODY A USER DATA : %s \n", bodyAUserData);
+    //printf("BODY B USER DATA : %s \n", bodyBUserData);
     if(!dataA.compare("BALL")) {
         ball = contact->GetFixtureA()->GetBody();
     } else if(!dataB.compare("BALL")) {
         ball = contact->GetFixtureB()->GetBody();
     }
+
     if(!dataA.compare("PLAYER")) {
         player = contact->GetFixtureA()->GetBody();
     } else if(!dataB.compare("PLAYER")) {
         player = contact->GetFixtureB()->GetBody();
     }
+
+    if(!dataA.compare("BRICK")) {
+        brick = contact->GetFixtureA()->GetBody();
+    } else if(!dataB.compare("BRICK")) {
+        brick = contact->GetFixtureB()->GetBody();
+    }
     
     if(ball && player) {
-        printf("SETTING BALL SPEED \n");
+        //printf("SETTING BALL SPEED \n");
         int numPoints = contact->GetManifold()->pointCount;
 
         //...world manifold is helpful for getting locations
@@ -41,15 +50,18 @@ void PlayerContactListener::BeginContact(b2Contact* contact) {
         contact->GetWorldManifold( &worldManifold );
         
         for (int i = 0; i < numPoints; i++) {
-            printf("X: %f, Y: %f \n", worldManifold.points[i].x, worldManifold.points[i].y);
-            printf("PLAYER WIDTH : %f \n " , playerWidth * screenToWorld);
+            //printf("PLAYER WIDTH : %f \n " , playerWidth * screenToWorld);
             float dx = worldManifold.points[i].x - player->GetPosition().x;
             
             float angle = 3.14 / 2.0 - dx * 3.14 / 4.0;
-            printf("FINDME: ==================== X VAL = %f \n", dx);
-            ball->SetLinearVelocity(b2Vec2(3.0 * cos(angle), 3.0 * sin (angle)));
+            //printf("FINDME: ==================== X VAL = %f \n", dx);
+            float speed = ball->GetLinearVelocity().Length();
+            ball->SetLinearVelocity(b2Vec2(speed * cos(angle), speed * sin (angle)));
         }
 
+    } 
+    if(ball && brick) {
+        ((GameObject*)(brick->GetUserData()))->destroy();
     }
 
 //    printf("FINDME: CONTACT STARTED \n");

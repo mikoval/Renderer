@@ -14,6 +14,7 @@
 #include "playerContactListener.h"
 
 #include "core_pong.h"
+#include <Renderer/text.h>
 
 using namespace std;
 
@@ -40,8 +41,18 @@ extern int screenHeight;
 int dir_right = 0;
 int dir_left = 0;
 
-float playerWidth = 200;
+float playerWidth = 150;
 
+float BALL_SPEED = 4.0;
+float PLAYER_SPEED = 2.0;
+float GRAVITY = -1.0;
+
+int score;
+int lives;
+int total_bricks;
+
+int BRICK_ROWS = 5;
+int BRICK_COLUMNS= 3;
 
 
 #define RAD(deg) ((3.14 * deg)/180.f)
@@ -49,7 +60,7 @@ float playerWidth = 200;
 
 unsigned long startTime;
 unsigned long prevTime;
-int count = 0;
+int fps_count = 0;
 
 float randFloat() {
     return (float)rand() / (float)RAND_MAX;
@@ -87,7 +98,7 @@ void mouse_move(double x, double y)
 }
 
 void key_press(int key, int scancode, int action, int mods) {
-    cout << "Key pressed: " << key << endl;
+    //cout << "Key pressed: " << key << endl;
     if(key == 65) {
         if(action == GLFW_PRESS) 
             dir_left = 1.0;
@@ -103,20 +114,57 @@ void key_press(int key, int scancode, int action, int mods) {
 }
 
 void update(unsigned long time) {
-    player->body->SetLinearVelocity(b2Vec2(dir_right - dir_left, 0.0));
+    player->body->SetLinearVelocity(b2Vec2(PLAYER_SPEED * dir_right - dir_left, 0.0));
+    player->body->SetTransform(b2Vec2(player->body->GetPosition().x, 0.0), 0.0);
+
     world->Step(timeStep, velocityIterations, positionIterations);
     long current = getTime();
     long ellapsedTime = current - startTime; 
-    count ++;
+    fps_count++;
     if(ellapsedTime > 1000 ) {
         startTime = current;
-        printf("count : %d \n", count);
-        count = 0;
+        printf("fps_count : %d \n", fps_count);
+        fps_count = 0;
     }
    // printf("ELLAPSED TIME = %u \n", current - startTime);
 
     for(int i = 0; i < bodies.size() ; i++ ) {
-        bodies[i]->update();
+        GameObject *gameObject = bodies[i];
+        if(gameObject->toDestroy) {
+            world->DestroyBody(gameObject->body);
+            bodies.erase(bodies.begin() + i);
+            renderer->removeRenderable(gameObject->getRenderable());
+            score++;
+            total_bricks--;
+            i--;
+            if(total_bricks == 0 ) {
+                printf("YOU WIN: SCORE = %d \n",score);
+            }
+        } else {
+            bodies[i]->update();
+        }
+    }
+}
+
+static void startGame() {
+    lives = 3;
+    score = 0;
+
+    float boxWidth = screenWidth / (BRICK_COLUMNS) - 5; 
+    float boxHeight = screenHeight/ 3.0 / (BRICK_ROWS) - 5;
+
+    total_bricks = BRICK_COLUMNS * BRICK_ROWS;
+
+    for(float i = 0.5; i < BRICK_COLUMNS; i++ ) {
+        for (float j = 0.5; j < BRICK_ROWS; j++ ) {
+            GameObject *brick = new GameRect(boxWidth, boxHeight, i * screenWidth / BRICK_COLUMNS, screenHeight - j * screenHeight / 3.0 / BRICK_ROWS);
+            brick->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
+            brick->body->SetType(b2_staticBody);
+            brick->fixture->SetRestitution(1.0);
+            brick->setTag("BRICK");
+            bodies.push_back(brick);
+            
+        }
     }
 }
 
@@ -131,69 +179,66 @@ int main() {
     renderer->setMouseMoveCallback(&mouse_move);
     	// Define the gravity vector.
     srand( (unsigned)time(NULL) );
-	b2Vec2 gravity(0.0f, 0.0f);
+	b2Vec2 gravity(0.0f, GRAVITY);
 
 	// Construct a world object, which will hold and simulate the rigid bodies.
 	world = new b2World(gravity);
 
 	// Define the ground body.
+
     {
-        b2BodyDef groundBodyDef;
-        groundBodyDef.position.Set(-10.0f, 0.0f);
-        b2Body* groundBody = world->CreateBody(&groundBodyDef);
-        b2PolygonShape groundBox;
-        groundBox.SetAsBox(10.0f, 50.0f);
-        groundBody->CreateFixture(&groundBox, 0.0f);
-        groundBody->SetUserData((char *)"NULL");
+        GameObject *leftWall = new GameRect(50, screenHeight,-25, screenHeight/2);
+        leftWall->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
+        leftWall->body->SetType(b2_staticBody);
+        leftWall->fixture->SetRestitution(1.0);
+        bodies.push_back(leftWall);
     }
     {
-        b2BodyDef groundBodyDef;
-        groundBodyDef.position.Set(screenWidth * screenToWorld + 10.0f, 0.0f);
-        b2Body* groundBody = world->CreateBody(&groundBodyDef);
-        b2PolygonShape groundBox;
-        groundBox.SetAsBox(10.0f, 50.0f);
-        groundBody->CreateFixture(&groundBox, 0.0f);
-        groundBody->SetUserData((char *)"NULL");
+        GameObject *leftWall = new GameRect(50, screenHeight, screenWidth+25, screenHeight/2);
+        leftWall->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
+        leftWall->body->SetType(b2_staticBody);
+        leftWall->fixture->SetRestitution(1.0);
+        bodies.push_back(leftWall);
     }
-    
-    
     {
-        b2BodyDef groundBodyDef;
-        groundBodyDef.position.Set(screenWidth * screenToWorld /2.0, screenHeight * screenToWorld +10);
-        b2Body* groundBody = world->CreateBody(&groundBodyDef);
-        b2PolygonShape groundBox;
-        groundBox.SetAsBox(50.0f, 10.0f);
-        groundBody->CreateFixture(&groundBox, 0.0f);
-        groundBody->SetUserData((char *)"NULL");
+        GameObject *leftWall = new GameRect(screenWidth, 50, screenWidth/2.0, screenHeight+25);
+        leftWall->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
+        leftWall->body->SetType(b2_staticBody);
+        leftWall->fixture->SetRestitution(1.0);
+        bodies.push_back(leftWall);
+    }
+    {
+        ball = new GameCircle( 10, screenWidth / 2, 500);
+        ball->getRenderable()->setColor(0.0, 1.0, 0.0, 1.0);
+        ball->body->SetLinearVelocity(b2Vec2(0.0, -1.0 * BALL_SPEED));
+        std::cout << "fixture addr outside : " << ball->fixture << std::endl;
+        ball->fixture->SetRestitution(1.0);
+        ball->body->ResetMassData();
+        ball->setTag("BALL");
+        bodies.push_back(ball);
+    }
+    {
+        player = new GameRect( playerWidth, 20, screenWidth / 2, 0);
+        player->getRenderable()->setColor(1.0, 0.0, 0.0, 1.0);
+        player->fixture->SetRestitution(1.0);
+        player->body->ResetMassData();
+        player->setTag("PLAYER");
+        bodies.push_back(player);
     }
 
-    
-    ball = new GameCircle( 10, screenWidth / 2, 500);
-    ball->getRenderable()->setColor(0.0, 1.0, 0.0, 1.0);
-    ball->body->SetLinearVelocity(b2Vec2(0.0, -3.0));
-    std::cout << "fixture addr outside : " << ball->fixture << std::endl;
-    ball->fixture->SetRestitution(1.0);
-    ball->fixture->SetDensity(0.1);
-    ball->body->ResetMassData();
-    ball->body->SetUserData((void *)"BALL");
 
-    bodies.push_back(ball);
-
-    player = new GameRect( playerWidth, 20, screenWidth / 2, 0);
-    player->getRenderable()->setColor(1.0, 0.0, 0.0, 1.0);
-    player->fixture->SetDensity(10000.0);
-    player->body->ResetMassData();
-    player->body->SetUserData((void *)"PLAYER");
-    //player->body->SetType(b2_kinematicBody);
-
-    bodies.push_back(player);
-
-    std::cout << "fixture addr outside : " << ball->fixture << std::endl;
+    startGame();
 
     PlayerContactListener listener; 
 
     world->SetContactListener(&listener);
 
+    Font font = LoadFont("assets/OpenSans-Regular.ttf");
+
+    Text *text = new Text("HELLO WORLD", font, 100.0, 100.0, 0.5);
+    text->setColor(0.0, 1.0, 0.0, 1.0);
+    renderer->addRenderable(text);
+    //Text text = new Text("HELLO WORLD", font);
     renderer->start();
 
     return 0;

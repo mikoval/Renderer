@@ -19,6 +19,7 @@ class Renderer {
         void setBackgroundColor(float r, float g, float b, float a);
         Color *backgroundColor = nullptr;
         void addRenderable(Renderable *renderable);
+        void removeRenderable(Renderable *renderable);
         std::vector<Renderable *> getRenderableList();
         void start();
     private:

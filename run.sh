@@ -2,5 +2,7 @@ cd build
 #rm -rf *
 cmake ..
 make
+
+cd ..
 #./bin/Sandbox0
-./bin/Pong
+./build/bin/Pong

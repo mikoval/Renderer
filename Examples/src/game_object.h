@@ -8,6 +8,10 @@ class GameObject {
         virtual void update() = 0;
         virtual Renderable *getRenderable() = 0;
         void setType(b2BodyType type) ;
-    private:
-
+        void setTag(std::string tag);
+        std::string getTag();
+        bool toDestroy = false;
+        void destroy();
+    protected:
+        std::string tag;
 };
