@@ -18,12 +18,15 @@
 
 using namespace std;
 
-
+#define WALL_WIDTH 10
+#define WALL_HEIGHT 30
 
 vector<GameObject *> bodies;
 
 GameObject *player;
 GameObject *ball;
+Text *scoreText;
+Text *livesText;
 
 Renderer *renderer;
 b2World *world;
@@ -43,16 +46,17 @@ int dir_left = 0;
 
 float playerWidth = 150;
 
-float BALL_SPEED = 4.0;
-float PLAYER_SPEED = 2.0;
-float GRAVITY = -1.0;
+float BALL_SPEED = 5.0;
+float PLAYER_SPEED = 3.0;
+float GRAVITY = -0.5;
 
+int level;
 int score;
 int lives;
 int total_bricks;
 
-int BRICK_ROWS = 5;
-int BRICK_COLUMNS= 3;
+int BRICK_ROWS = 2;
+int BRICK_COLUMNS= 2;
 
 
 #define RAD(deg) ((3.14 * deg)/180.f)
@@ -113,8 +117,54 @@ void key_press(int key, int scancode, int action, int mods) {
     }
 }
 
+static void restartBall() {
+    float speed = BALL_SPEED + level;
+    ball->body->SetLinearVelocity(b2Vec2(0.0, 1.0 * speed));
+    ball->body->SetTransform(player->body->GetPosition()+b2Vec2(0.0, 0.2),0.0f);
+}
+
+static void startGame() {
+
+    int rows = BRICK_ROWS + level;
+    int columns = BRICK_COLUMNS + level;
+
+    restartBall();
+    float gameWidth = screenWidth - (WALL_WIDTH * 2);
+    float gameHeight = screenHeight -  WALL_HEIGHT;
+
+    float boxWidth = gameWidth / (columns) - 5; 
+    float boxHeight = gameHeight/ 3.0 / (rows) - 5;
+
+    total_bricks = columns * rows;
+
+    for(int i = 0; i < bodies.size() ; i++ ) {
+        GameObject *gameObject = bodies[i];
+        if(!gameObject->getTag().compare("BRICK")) {
+            world->DestroyBody(gameObject->body);
+            bodies.erase(bodies.begin() + i);
+            renderer->removeRenderable(gameObject->getRenderable());
+            i--;
+
+        }
+    }
+
+    for(float i = 0.5; i < columns; i++ ) {
+        for (float j = 0.5; j < rows; j++ ) {
+            GameObject *brick = new GameRect(boxWidth, boxHeight, WALL_WIDTH +  i * gameWidth / columns, gameHeight - j * gameHeight / 3.0 / rows);
+            brick->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
+            brick->body->SetType(b2_staticBody);
+            brick->fixture->SetRestitution(1.0);
+            brick->setTag("BRICK");
+            bodies.push_back(brick);
+            
+        }
+    }
+
+}
+
+
 void update(unsigned long time) {
-    player->body->SetLinearVelocity(b2Vec2(PLAYER_SPEED * dir_right - dir_left, 0.0));
+    player->body->SetLinearVelocity(b2Vec2(PLAYER_SPEED * (dir_right - dir_left), 0.0));
     player->body->SetTransform(b2Vec2(player->body->GetPosition().x, 0.0), 0.0);
 
     world->Step(timeStep, velocityIterations, positionIterations);
@@ -128,6 +178,24 @@ void update(unsigned long time) {
     }
    // printf("ELLAPSED TIME = %u \n", current - startTime);
 
+    if(ball->body->GetPosition().y < 0){
+        lives--;
+        livesText->setText("LIVES: " + std::to_string(lives));
+        if(lives == 0){
+            printf("YOU LOSE: SCORE = %d \n",score);
+            score = 0;
+            lives = 3;
+            level = 0;
+            startGame();
+        }
+
+
+        restartBall();
+        livesText->setText("LIVES: " + std::to_string(lives));
+        scoreText->setText("SCORE: " + std::to_string(score));
+
+    }
+
     for(int i = 0; i < bodies.size() ; i++ ) {
         GameObject *gameObject = bodies[i];
         if(gameObject->toDestroy) {
@@ -137,33 +205,15 @@ void update(unsigned long time) {
             score++;
             total_bricks--;
             i--;
+            scoreText->setText("SCORE: " + std::to_string(score));
             if(total_bricks == 0 ) {
                 printf("YOU WIN: SCORE = %d \n",score);
+                level++;
+                startGame();
             }
+
         } else {
             bodies[i]->update();
-        }
-    }
-}
-
-static void startGame() {
-    lives = 3;
-    score = 0;
-
-    float boxWidth = screenWidth / (BRICK_COLUMNS) - 5; 
-    float boxHeight = screenHeight/ 3.0 / (BRICK_ROWS) - 5;
-
-    total_bricks = BRICK_COLUMNS * BRICK_ROWS;
-
-    for(float i = 0.5; i < BRICK_COLUMNS; i++ ) {
-        for (float j = 0.5; j < BRICK_ROWS; j++ ) {
-            GameObject *brick = new GameRect(boxWidth, boxHeight, i * screenWidth / BRICK_COLUMNS, screenHeight - j * screenHeight / 3.0 / BRICK_ROWS);
-            brick->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
-            brick->body->SetType(b2_staticBody);
-            brick->fixture->SetRestitution(1.0);
-            brick->setTag("BRICK");
-            bodies.push_back(brick);
-            
         }
     }
 }
@@ -171,6 +221,9 @@ static void startGame() {
 int main() {
     startTime = prevTime = getTime();
     renderer = new Renderer(400, 800, "Hello world");
+    lives = 3;
+    score = 0;
+    level = 1;
 
     renderer->setUpdateCallback(&update);
 
@@ -187,30 +240,34 @@ int main() {
 	// Define the ground body.
 
     {
-        GameObject *leftWall = new GameRect(50, screenHeight,-25, screenHeight/2);
+        GameObject *leftWall = new GameRect( WALL_WIDTH * 2, screenHeight,0.0, screenHeight/2);
         leftWall->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
         leftWall->body->SetType(b2_staticBody);
         leftWall->fixture->SetRestitution(1.0);
+        leftWall->getRenderable()->setColor(0.5, 0.5, 0.5, 1.0);
         bodies.push_back(leftWall);
     }
     {
-        GameObject *leftWall = new GameRect(50, screenHeight, screenWidth+25, screenHeight/2);
+        GameObject *leftWall = new GameRect( WALL_WIDTH * 2, screenHeight, screenWidth, screenHeight/2);
         leftWall->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
         leftWall->body->SetType(b2_staticBody);
         leftWall->fixture->SetRestitution(1.0);
+        leftWall->getRenderable()->setColor(0.5, 0.5, 0.5, 1.0);
+
         bodies.push_back(leftWall);
     }
     {
-        GameObject *leftWall = new GameRect(screenWidth, 50, screenWidth/2.0, screenHeight+25);
+        GameObject *leftWall = new GameRect(screenWidth,  WALL_WIDTH * 6, screenWidth/2.0, screenHeight);
         leftWall->getRenderable()->setColor(1.0, 1.0, 1.0, 1.0);
         leftWall->body->SetType(b2_staticBody);
         leftWall->fixture->SetRestitution(1.0);
+        leftWall->getRenderable()->setColor(0.5, 0.5, 0.5, 1.0);
+
         bodies.push_back(leftWall);
     }
     {
         ball = new GameCircle( 10, screenWidth / 2, 500);
         ball->getRenderable()->setColor(0.0, 1.0, 0.0, 1.0);
-        ball->body->SetLinearVelocity(b2Vec2(0.0, -1.0 * BALL_SPEED));
         std::cout << "fixture addr outside : " << ball->fixture << std::endl;
         ball->fixture->SetRestitution(1.0);
         ball->body->ResetMassData();
@@ -235,9 +292,14 @@ int main() {
 
     Font font = LoadFont("assets/OpenSans-Regular.ttf");
 
-    Text *text = new Text("HELLO WORLD", font, 100.0, 100.0, 0.5);
-    text->setColor(0.0, 1.0, 0.0, 1.0);
-    renderer->addRenderable(text);
+    scoreText = new Text("SCORE: " + std::to_string(score), font, WALL_WIDTH + 10, screenHeight - WALL_HEIGHT + 3, WALL_HEIGHT-2);
+    scoreText->setColor(0.0, 0.0, 0.0, 1.0);
+    renderer->addRenderable(scoreText);
+
+
+    livesText = new Text("LIVES: " + std::to_string(lives), font, WALL_WIDTH + 200, screenHeight - WALL_HEIGHT + 3, WALL_HEIGHT-2);
+    livesText->setColor(0.0, 0.0, 0.0, 1.0);
+    renderer->addRenderable(livesText);
     //Text text = new Text("HELLO WORLD", font);
     renderer->start();
 

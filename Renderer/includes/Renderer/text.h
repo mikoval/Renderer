@@ -25,5 +25,4 @@ private:
 	unsigned int shaderProgram;
 	unsigned int VAO;
 	unsigned int VBO;
-
 };
