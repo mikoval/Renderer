@@ -26,7 +26,8 @@ GameCircle::GameCircle(int radius, int x, int y) {
     fixtureDef.density = 1.0f;
 
     // Override the default friction.
-    fixtureDef.friction = 0.0f;
+    fixtureDef.friction = 0.3f;
+    fixtureDef.restitution=0.4f;
 
     // Add the shape to the body.
     fixture = body->CreateFixture(&fixtureDef);
@@ -46,3 +47,18 @@ void GameCircle::update() {
 Renderable *GameCircle::getRenderable() {
     return renderable;
 }
+
+void GameCircle::setFriction(float friction){
+    for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext())
+      {
+        f->SetFriction(friction);
+      }
+}
+
+void GameCircle::setRestitution(float restitution){
+    for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext())
+      {
+        f->SetRestitution(restitution);
+      }
+}
+

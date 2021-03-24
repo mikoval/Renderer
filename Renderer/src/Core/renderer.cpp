@@ -117,8 +117,11 @@ int renderLoop(Renderer *renderer, int width, int height, string name) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         vector<Renderable *> renderableList = renderer->getRenderableList();
+        Camera *camera = renderer->getCamera();
+        glm::mat4 cameraMat = camera->getProjection() * camera->getView();
+
         for(int i = 0; i < renderableList.size(); i++) {
-           renderableList[i]->render(); 
+           renderableList[i]->render(cameraMat); 
         }
         glfwPollEvents();
         glfwSwapBuffers(window);
@@ -129,3 +132,12 @@ int renderLoop(Renderer *renderer, int width, int height, string name) {
     glfwTerminate();
     return 0;
 }
+
+void Renderer::setCamera(Camera *camera) {
+    this->camera = camera;
+}
+
+Camera *Renderer::getCamera() {
+    return camera;
+}
+

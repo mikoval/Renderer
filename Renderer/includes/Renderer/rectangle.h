@@ -4,7 +4,7 @@
 class Rectangle: public Renderable {
     public:
         Rectangle(int width, int height);
-        void render();
+        void render(glm::mat4 mat);
         glm::vec2 position;
         float rotation;
         glm::vec2 scale;

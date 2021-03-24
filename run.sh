@@ -4,5 +4,6 @@ cmake ..
 make
 
 cd ..
-#./bin/Sandbox0
-./build/bin/Pong
+#./build/bin/Sandbox0
+#./build/bin/Pong
+./build/bin/Platformer

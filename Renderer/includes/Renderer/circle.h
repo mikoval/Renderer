@@ -4,7 +4,7 @@
 class Circle: public Renderable {
     public:
         Circle(int radius);
-        void render();
+        void render(glm::mat4 mat);
         glm::vec2 position;
         float rotation;
         glm::vec2 scale;

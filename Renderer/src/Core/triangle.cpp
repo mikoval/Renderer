@@ -16,12 +16,12 @@ Triangle::Triangle(glm::vec2 a, glm::vec2 b, glm::vec2 c) {
     mInit = false;
 }
 
-void Triangle::render() {
+void Triangle::render(glm::mat4 mat) {
     if(!mInit) {
         init();
     }
 
-    glm::mat4 P = glm::ortho(-600.0f, 600.0f,400.0f,-400.0f, -1.0f, 100.0f);
+    glm::mat4 P = mat;
 
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));

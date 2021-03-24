@@ -7,7 +7,10 @@ class GameCircle: public GameObject {
         GameCircle(int radius, int x, int y);
         void update();
         Renderable *getRenderable();
+        void setFriction(float friction);
+        void setRestitution(float restitution);
     private:
         Circle *renderable;
+
 
 };

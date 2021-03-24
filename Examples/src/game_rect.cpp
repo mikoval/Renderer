@@ -25,7 +25,7 @@ GameRect::GameRect(int width, int height, int x, int y) {
     fixtureDef.density = 1.0f;
 
     // Override the default friction.
-    fixtureDef.friction = 0.0f;
+    fixtureDef.friction = 0.3f;
 
     // Add the shape to the body.
     
@@ -46,4 +46,17 @@ void GameRect::update() {
 
 Renderable *GameRect::getRenderable() {
     return renderable;
+}
+
+void GameRect::setFriction(float friction) {
+for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext())
+  {
+    f->SetFriction(friction);
+  }
+}
+void GameRect::setRestitution(float restitution){
+    for (b2Fixture* f = body->GetFixtureList(); f; f = f->GetNext())
+      {
+        f->SetRestitution(restitution);
+      }
 }

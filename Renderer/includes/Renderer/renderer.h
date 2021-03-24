@@ -4,6 +4,8 @@
 #include <Renderer/color.h>
 #include <vector>
 #include <Renderer/renderable.h>
+#include <Renderer/camera.h>
+
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // GLFW helper library
@@ -21,11 +23,15 @@ class Renderer {
         void addRenderable(Renderable *renderable);
         void removeRenderable(Renderable *renderable);
         std::vector<Renderable *> getRenderableList();
+        void setCamera(Camera *camera);
+        Camera * getCamera();
+        void setImage(std::string path);
         void start();
     private:
         std::vector<Renderable *> renderable_list;
         int width;
         int height;
         std::string name;
+        Camera *camera;
 };
 

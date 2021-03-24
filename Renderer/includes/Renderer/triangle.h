@@ -4,7 +4,7 @@
 class Triangle: public Renderable {
     public:
         Triangle(glm::vec2 a, glm::vec2 b, glm::vec2 c);
-        void render();
+        void render(glm::mat4 mat);
         glm::vec2 position;
         float rotation;
         float scale;

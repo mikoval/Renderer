@@ -8,6 +8,8 @@ class GameRect : public GameObject {
         GameRect(int width, int height, int x, int y);
         void update();
         Renderable *getRenderable();
+        void setFriction(float friction);
+        void setRestitution(float restitution);
     private:
 
 };

@@ -138,7 +138,7 @@ Text::Text(std::string text, Font font, float x, float y, float size){
     this->scale.y = size;
 }
 
-void Text::render() {
+void Text::render(glm::mat4 mat) {
     if(!mInit) {
         init();
     }
@@ -160,7 +160,7 @@ void Text::render() {
     glUniform1i(glGetUniformLocation(shaderProgram, "text"), 0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glm::mat4 P = glm::ortho(0.0f, (float)screenWidth,0.0f,(float)screenHeight, -1.0f, 100.0f);
+    glm::mat4 P = mat;
     glm::mat4 model = glm::mat4(1.0);
     /*
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
@@ -219,9 +219,9 @@ void Text::setText(string text) {
     coords[n++] = (point){x2 + w, -y2 - h, c[*p].tx + c[*p].bw / atlas_width,                 c[*p].bh / atlas_height};
   }
 
-  glBufferData(GL_ARRAY_BUFFER, sizeof coords, coords, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof coords, coords, GL_DYNAMIC_DRAW);
 
-      glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    glBindBuffer(GL_ARRAY_BUFFER, 0); 
     glBindVertexArray(0); 
 
 }

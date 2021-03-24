@@ -272,6 +272,8 @@ int main() {
         ball->fixture->SetRestitution(1.0);
         ball->body->ResetMassData();
         ball->setTag("BALL");
+        ball->setFriction(0.0);
+
         bodies.push_back(ball);
     }
     {
@@ -280,6 +282,8 @@ int main() {
         player->fixture->SetRestitution(1.0);
         player->body->ResetMassData();
         player->setTag("PLAYER");
+        player->setFriction(0.0);
+
         bodies.push_back(player);
     }
 
@@ -300,7 +304,6 @@ int main() {
     livesText = new Text("LIVES: " + std::to_string(lives), font, WALL_WIDTH + 200, screenHeight - WALL_HEIGHT + 3, WALL_HEIGHT-2);
     livesText->setColor(0.0, 0.0, 0.0, 1.0);
     renderer->addRenderable(livesText);
-    //Text text = new Text("HELLO WORLD", font);
     renderer->start();
 
     return 0;

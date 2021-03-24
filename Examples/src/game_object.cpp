@@ -15,3 +15,7 @@ std::string GameObject::getTag() {
 void GameObject::destroy() {
     toDestroy = true;
 }
+
+glm::vec2 GameObject::getPosition() {
+	 return glm::vec2(body->GetPosition().x  * 100, body->GetPosition().y * 100);
+}

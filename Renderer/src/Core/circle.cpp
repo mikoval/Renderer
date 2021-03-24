@@ -17,12 +17,12 @@ Circle::Circle(int radius) {
     setColor(1.0, 1.0, 1.0, 1.0);
 }
 
-void Circle::render() {
+void Circle::render(glm::mat4 mat) {
     if(!mInit) {
         init();
     }
 
-    glm::mat4 P = glm::ortho(0.0f, (float)screenWidth,0.0f,(float)screenHeight, -1.0f, 100.0f);
+    glm::mat4 P = mat;
 
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
@@ -32,11 +32,22 @@ void Circle::render() {
 
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
+
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
 
+    unsigned int uv_transformLoc = glGetUniformLocation(shaderProgram, "uv_transform");
+    glUniformMatrix4fv(uv_transformLoc, 1, GL_FALSE, glm::value_ptr(UVTransform));
+
+    
+
     unsigned int colorLoc = glGetUniformLocation(shaderProgram, "color");
     glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(glGetUniformLocation(shaderProgram, "image"), 0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+
     //glDrawArrays(GL_TRIANGLES, 0, 3);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
@@ -46,20 +57,25 @@ void Circle::init() {
         "layout (location = 0) in vec2 aPos;\n"
         "layout (location = 1) in vec2 aUv;\n"
         "uniform mat4 transform;"
+        "uniform mat4 uv_transform;"
         "out vec2 vUv;"
         "void main()\n"
         "{\n"
         "   gl_Position = transform * vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
-        "   vUv = aUv;\n"
+        "   vUv = (uv_transform * vec4(aUv, 0.0, 1.0)).xy;\n"
+        //"   vUv = aUv;\n"
         "}\0";
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
         "in vec2 vUv;\n"
         "uniform vec4 color;"
+        "uniform sampler2D image;\n"
+
         "void main()\n"
         "{\n"
         "   if(length(2.0f * (vUv - 0.5f)) > 1.0) { discard; }\n"
-        "   FragColor = color;\n"
+        //"   FragColor = texture(image, vUv) + vec4(vUv, 0.0, 1.0);\n"
+        "   FragColor = texture(image, vUv) + color;\n"
         "}\n\0";
 
     unsigned int VBO_VERTICES;
