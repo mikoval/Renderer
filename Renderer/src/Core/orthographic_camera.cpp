@@ -8,7 +8,7 @@
 #include "gl_core.h"
 
 OrthographicCamera::OrthographicCamera(float x, float y, float width, float height) {
-    position.x;
+    position.x = x;
     position.y = y;
     this->width = width;
     this->height = height;

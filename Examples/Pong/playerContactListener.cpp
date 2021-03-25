@@ -2,6 +2,8 @@
 #include "game_rect.h"
 #include "core_pong.h"
 
+#include<iostream>
+
 using namespace std;
 
 void PlayerContactListener::PreSolve(b2Contact *contact, const b2Manifold *oldManifold) {
@@ -16,13 +18,13 @@ void PlayerContactListener::BeginContact(b2Contact* contact) {
     b2Body *brick = nullptr;
 
     GameObject *bodyA = (GameObject *)contact->GetFixtureA()->GetBody()->GetUserData();
-    GameObject *bodyB = (GameObject *)contact->GetFixtureB()->GetBody()->GetUserData();
-     const char *bodyAUserData = bodyA->getTag().c_str();
-     const char *bodyBUserData = bodyB->getTag().c_str(); 
+    const char *bodyAUserData = bodyA->getTag().c_str();
     string dataA(bodyAUserData);
+
+    GameObject *bodyB = (GameObject *)contact->GetFixtureB()->GetBody()->GetUserData();
+    const char *bodyBUserData = bodyB->getTag().c_str(); 
     string dataB(bodyBUserData);
-    //printf("BODY A USER DATA : %s \n", bodyAUserData);
-    //printf("BODY B USER DATA : %s \n", bodyBUserData);
+
     if(!dataA.compare("BALL")) {
         ball = contact->GetFixtureA()->GetBody();
     } else if(!dataB.compare("BALL")) {
@@ -54,7 +56,6 @@ void PlayerContactListener::BeginContact(b2Contact* contact) {
             float dx = worldManifold.points[i].x - player->GetPosition().x;
             
             float angle = 3.14 / 2.0 - dx * 3.14 / 4.0;
-            //printf("FINDME: ==================== X VAL = %f \n", dx);
             float speed = ball->GetLinearVelocity().Length();
             ball->SetLinearVelocity(b2Vec2(speed * cos(angle), speed * sin (angle)));
         }
@@ -64,9 +65,7 @@ void PlayerContactListener::BeginContact(b2Contact* contact) {
         ((GameObject*)(brick->GetUserData()))->destroy();
     }
 
-//    printf("FINDME: CONTACT STARTED \n");
 
 }
 void PlayerContactListener::EndContact(b2Contact* contact) {
-//    printf("FINDME: CONTACT FINISHED \n");
 }

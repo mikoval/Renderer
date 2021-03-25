@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <thread>
+#include <algorithm>
 
 #include <Renderer/renderer.h>
 #include <Renderer/circle.h>

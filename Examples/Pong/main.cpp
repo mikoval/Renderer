@@ -7,6 +7,7 @@
 #include "game_object.h"
 #include "game_rect.h"
 #include "game_circle.h"
+#include <algorithm>
 
 #include <stdlib.h>
 #include <sys/time.h>
@@ -280,13 +281,17 @@ int main() {
         player = new GameRect( playerWidth, 20, screenWidth / 2, 0);
         player->getRenderable()->setColor(1.0, 0.0, 0.0, 1.0);
         player->fixture->SetRestitution(1.0);
+        player->fixture->SetRestitution(1.0);
+//        player->fixture->SetDensity(0);
+
         player->body->ResetMassData();
         player->setTag("PLAYER");
+        
+        player->body->SetType(b2_dynamicBody);
         player->setFriction(0.0);
 
         bodies.push_back(player);
     }
-
 
     startGame();
 
@@ -297,13 +302,18 @@ int main() {
     Font font = LoadFont("assets/OpenSans-Regular.ttf");
 
     scoreText = new Text("SCORE: " + std::to_string(score), font, WALL_WIDTH + 10, screenHeight - WALL_HEIGHT + 3, WALL_HEIGHT-2);
-    scoreText->setColor(0.0, 0.0, 0.0, 1.0);
+    scoreText->setColor(1.0, 1.0, 1.0, 1.0);
     renderer->addRenderable(scoreText);
 
+    Camera *camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight);
+    renderer->setCamera(camera);
 
     livesText = new Text("LIVES: " + std::to_string(lives), font, WALL_WIDTH + 200, screenHeight - WALL_HEIGHT + 3, WALL_HEIGHT-2);
-    livesText->setColor(0.0, 0.0, 0.0, 1.0);
+    livesText->setColor(1.0, 1.0, 1.0, 1.0);
     renderer->addRenderable(livesText);
+
+    printf("PLAYER TAG: %s \n", player->getTag().c_str());
+    printf("BALL TAG: %s \n", ball->getTag().c_str());
     renderer->start();
 
     return 0;

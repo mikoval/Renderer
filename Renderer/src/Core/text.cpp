@@ -43,15 +43,11 @@ struct character_info {
 std::map<char, Character> Characters;
 
 
- GLuint texture;
- int atlas_width;
- int atlas_height;
+GLuint texture_map;
+int atlas_width;
+int atlas_height;
 
 Font LoadFont(string path) {
-
-
-
-
     cout << "LOADING : " << path << endl;
 
     FT_Library ft;
@@ -91,14 +87,15 @@ Font LoadFont(string path) {
 
 
     glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glGenTextures(1, &texture_map);
+    glBindTexture(GL_TEXTURE_2D, texture_map);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    std::cout << "LOADING FONT : " <<  "TEXTURE ID : " << texture_map << std::endl;
 
-    const unsigned char data[] = {0xFF, 0, 0, 0xFF};
-
+    //const unsigned char data[] = {0xFF, 0, 0, 0xFF};
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 1, 1, 0, GL_RED, GL_UNSIGNED_BYTE, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -130,12 +127,13 @@ Font LoadFont(string path) {
 Text::Text(std::string text, Font font, float x, float y, float size){
     mInit = false;
     std::cout << "CREATING TEXT: " << text << std::endl;
+    std::cout << "CREaTING TEXT : " <<  "TEXTURE ID : " << texture_map<< std::endl;
     this->text = text;
     this->font = font;
     this->position.x = x;
     this->position.y = y;
-    this->scale.x = size;
-    this->scale.y = size;
+    this->scale.x = size/6.0;
+    this->scale.y = size/6.0;
 }
 
 void Text::render(glm::mat4 mat) {
@@ -143,30 +141,22 @@ void Text::render(glm::mat4 mat) {
         init();
     }
 
-
-
-
-
     glUseProgram(shaderProgram);
-
 
     glBindVertexArray(VAO);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
-    glUniform4f(glGetUniformLocation(shaderProgram, "textColor"), color.r, color.g, color.b, color.a);
 
     glActiveTexture(GL_TEXTURE0);
     glUniform1i(glGetUniformLocation(shaderProgram, "text"), 0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture_map);
 
     glm::mat4 P = mat;
     glm::mat4 model = glm::mat4(1.0);
-    /*
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
     model = glm::rotate(model, rotation, glm::vec3(0.0, 0.0, 1.0));
     model = glm::scale(model, glm::vec3(scale.x, scale.y, 0.0));
-    */
     model = P * model;
 
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
@@ -193,8 +183,8 @@ void Text::setText(string text) {
 
       n = 0;
 
-  float x = position.x;
-  float y = position.y;
+  float x = 0;
+  float y = 0;
   float sx = scale.x / ATLAS_SIZE;
   float sy = scale.y / ATLAS_SIZE;
   for(const char *p = text.c_str(); *p; p++) { 
@@ -211,12 +201,14 @@ void Text::setText(string text) {
     if(!w || !h)
       continue;
 
+
     coords[n++] = (point){x2,     -y2    , c[*p].tx,                                            0};
     coords[n++] = (point){x2 + w, -y2    , c[*p].tx + c[*p].bw / atlas_width,   0};
     coords[n++] = (point){x2,     -y2 - h, c[*p].tx,                                          c[*p].bh / atlas_height}; //remember: each glyph occupies a different amount of vertical space
     coords[n++] = (point){x2 + w, -y2    , c[*p].tx + c[*p].bw / atlas_width,   0};
     coords[n++] = (point){x2,     -y2 - h, c[*p].tx,                                          c[*p].bh / atlas_height};
     coords[n++] = (point){x2 + w, -y2 - h, c[*p].tx + c[*p].bw / atlas_width,                 c[*p].bh / atlas_height};
+
   }
 
     glBufferData(GL_ARRAY_BUFFER, sizeof coords, coords, GL_DYNAMIC_DRAW);
@@ -233,6 +225,7 @@ void Text::init() {
         "void main()\n"
         "{\n"
         "   gl_Position =  transform * vec4(vertex.xy, 0.0, 1.0);\n"
+        //"   gl_Position =  vec4(vertex.xy, 0.0, 1.0);\n"
         "   TexCoords = vertex.zw;\n"
         "}\0";
     const char *fragmentShaderSource = "#version 330 core\n"
@@ -243,9 +236,7 @@ void Text::init() {
         "void main()\n"
         "{\n"
             "vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);\n"
-//            "vec4 sampled = vec4(1.0, 1.0, 1.0, 1.0);\n"
             "FragColor = color * sampled;\n"
-//            "FragColor = vec4(texture(text, TexCoords).r, 0.0, 1.0, 1.0f);\n"
         "}\n\0";
 
 
@@ -259,5 +250,4 @@ void Text::init() {
     setText(text);
 
     mInit = true;
-
 }

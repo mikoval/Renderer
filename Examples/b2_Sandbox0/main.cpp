@@ -123,6 +123,10 @@ int main() {
 
     renderer->setUpdateCallback(&update);
 
+
+    Camera *camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight);
+    renderer->setCamera(camera);
+
     renderer->setKeyboardCallback(&key_press);
     renderer->setMouseButtonCallback(&mouse_button_press);
     renderer->setMouseMoveCallback(&mouse_move);
