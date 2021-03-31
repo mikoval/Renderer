@@ -164,7 +164,7 @@ static void startGame() {
 }
 
 
-void update(unsigned long time) {
+void update(double time) {
     player->body->SetLinearVelocity(b2Vec2(PLAYER_SPEED * (dir_right - dir_left), 0.0));
     player->body->SetTransform(b2Vec2(player->body->GetPosition().x, 0.0), 0.0);
 
@@ -305,7 +305,7 @@ int main() {
     scoreText->setColor(1.0, 1.0, 1.0, 1.0);
     renderer->addRenderable(scoreText);
 
-    Camera *camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight);
+    Camera *camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight, -1, 100);
     renderer->setCamera(camera);
 
     livesText = new Text("LIVES: " + std::to_string(lives), font, WALL_WIDTH + 200, screenHeight - WALL_HEIGHT + 3, WALL_HEIGHT-2);

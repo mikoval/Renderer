@@ -4,10 +4,11 @@
 class Circle: public Renderable {
     public:
         Circle(int radius);
-        void render(glm::mat4 mat);
+        void render(Camera *camera);
         glm::vec2 position;
         float rotation;
         glm::vec2 scale;
+        void setShader(Shader *shader);
     private:
         bool mInit;
         void init();

@@ -1,13 +1,17 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "renderable.h"
-class Rectangle: public Renderable {
+#include "light.h"
+#include <Renderer/cube.h>
+
+class PointLight: public Light {
     public:
-        Rectangle(int width, int height);
+        PointLight();
         void render(Camera *camera);
+        char getLightType();
     private:
         bool mInit;
         void init();
         unsigned int shaderProgram;
         unsigned int VAO;
+        Cube *cube;
 };

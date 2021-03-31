@@ -1,9 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "renderable.h"
-class Rectangle: public Renderable {
+class Cube: public Renderable {
     public:
-        Rectangle(int width, int height);
+        Cube();
         void render(Camera *camera);
     private:
         bool mInit;

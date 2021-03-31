@@ -82,7 +82,7 @@ void key_press(int key, int scancode, int action, int mods) {
     }
 }
 
-void update(unsigned long time) {
+void update(double time) {
 
     world->Step(timeStep, velocityIterations, positionIterations);
 
@@ -124,7 +124,7 @@ int main() {
     renderer->setUpdateCallback(&update);
 
 
-    Camera *camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight);
+    Camera *camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight, -1, 100);
     renderer->setCamera(camera);
 
     renderer->setKeyboardCallback(&key_press);

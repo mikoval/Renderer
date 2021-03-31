@@ -17,12 +17,12 @@ Circle::Circle(int radius) {
     setColor(1.0, 1.0, 1.0, 1.0);
 }
 
-void Circle::render(glm::mat4 mat) {
+void Circle::render(Camera *camera) {
     if(!mInit) {
         init();
     }
 
-    glm::mat4 P = mat;
+    glm::mat4 P = camera->getProjection() * camera->getView();
 
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
@@ -126,6 +126,10 @@ void Circle::init() {
     glBindVertexArray(0);
 
     mInit = true;
+}
 
+void Circle::setShader(Shader *shader){
+    printf("SETTING SHADER ON CIRCLE HAS NO EFFECT\n");
+    assert(0);
 }
 

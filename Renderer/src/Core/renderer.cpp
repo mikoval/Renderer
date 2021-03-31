@@ -10,6 +10,8 @@
 #include <Renderer/circle.h>
 #include "gl_context.h"
 #include "gl_core.h"
+#include "glm/ext.hpp"
+#include "glm/gtx/string_cast.hpp"
 
 using namespace std;
 
@@ -19,7 +21,7 @@ GLFWwindow* window;
 static void (*key_callback)(int, int, int, int);
 static void (*mouse_button_callback)(int, int, int);
 static void (*mouse_move_callback)(double, double);
-static void (*update_callback)(unsigned long);
+static void (*update_callback)(double);
 
 int screenWidth;
 int screenHeight;
@@ -58,7 +60,7 @@ void Renderer::setMouseMoveCallback(void (*callback)(double, double)) {
     mouse_move_callback = callback;
 }
 
-void Renderer::setUpdateCallback(void (*callback)(unsigned long)) {
+void Renderer::setUpdateCallback(void (*callback)(double)) {
     update_callback = callback;
 }
 
@@ -98,9 +100,15 @@ void Renderer::addRenderable(Renderable *renderable) {
     renderable_list.push_back(renderable);
 }
 
+void Renderer::addLight(Light *light) {
+    light_list.push_back(light);
+}
+
 vector<Renderable *>  Renderer::getRenderableList() {
     return renderable_list;
-    
+}
+vector<Light *>  *Renderer::getLightList() {
+    return &light_list;
 }
 
 int renderLoop(Renderer *renderer, int width, int height, string name) {
@@ -108,25 +116,33 @@ int renderLoop(Renderer *renderer, int width, int height, string name) {
     glfwSetMouseButtonCallback(window, mouse_press_base);
     glfwSetCursorPosCallback(window, mouse_move_base);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwWindowHint(GLFW_SAMPLES, 4);
     while(!glfwWindowShouldClose(window)) {
         if(renderer->backgroundColor) {
             Color *color = renderer->backgroundColor;
             glClearColor(color->r, color->g, color->b, 1.0);
         } else {
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         }
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);  
 
         vector<Renderable *> renderableList = renderer->getRenderableList();
+        vector<Light *> *lightList = renderer->getLightList();
         Camera *camera = renderer->getCamera();
-        glm::mat4 cameraMat = camera->getProjection() * camera->getView();
 
         for(int i = 0; i < renderableList.size(); i++) {
-           renderableList[i]->render(cameraMat); 
+           renderableList[i]->render(camera); 
+        }
+        for(int i = 0; i < lightList->size(); i++) {
+           (*lightList)[i]->render(camera); 
         }
         glfwPollEvents();
         glfwSwapBuffers(window);
-        update_callback(0);
+        update_callback(glfwGetTime());
     }
 
     // close GL context and any other GLFW resources
@@ -138,7 +154,11 @@ void Renderer::setCamera(Camera *camera) {
     this->camera = camera;
 }
 
+void Renderer::kill() {
+    glfwDestroyWindow(window);
+}
+
+
 Camera *Renderer::getCamera() {
     return camera;
 }
-

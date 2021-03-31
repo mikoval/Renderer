@@ -105,7 +105,7 @@ void key_press(int key, int scancode, int action, int mods) {
     }
 }
 
-void update(unsigned long time) {
+void update(double time) {
     float FORCE = 0.2;
     float total_force = 0.0;
     if(rightKey) {
@@ -198,7 +198,7 @@ int main() {
 	// Define the ground body.
     renderer = new Renderer(1200, 800, "Platformer");
 
-    camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight);
+    camera = new OrthographicCamera(screenWidth/2, screenHeight/2, screenWidth, screenHeight, -1, 100);
 
     renderer->setCamera(camera);
 

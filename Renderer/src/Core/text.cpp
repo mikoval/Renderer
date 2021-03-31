@@ -136,7 +136,7 @@ Text::Text(std::string text, Font font, float x, float y, float size){
     this->scale.y = size/6.0;
 }
 
-void Text::render(glm::mat4 mat) {
+void Text::render(Camera *camera) {
     if(!mInit) {
         init();
     }
@@ -152,7 +152,7 @@ void Text::render(glm::mat4 mat) {
     glUniform1i(glGetUniformLocation(shaderProgram, "text"), 0);
     glBindTexture(GL_TEXTURE_2D, texture_map);
 
-    glm::mat4 P = mat;
+    glm::mat4 P = camera->getProjection() * camera->getView();
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f));
     model = glm::rotate(model, rotation, glm::vec3(0.0, 0.0, 1.0));

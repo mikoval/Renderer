@@ -13,7 +13,7 @@ public:
 	Text(std::string text, Font font, float x, float y, float size);
 	void setText(std::string text);
 	void setSize(int size);
-	void render(glm::mat4 mat);
+	void render(Camera *camera);
     glm::vec2 position;
     float rotation = 0.0;
     glm::vec2 scale;
